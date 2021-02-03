@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_home/tab/my_flexible_space_bar.dart';
 import 'package:flutter_home/tab/my_sliver_app_bar.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'dart:math' as math;
 class HomeBannerWidget extends StatefulWidget {
   @override
   _HomeBannerWidgetState createState() => _HomeBannerWidgetState();

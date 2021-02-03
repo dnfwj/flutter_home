@@ -51,20 +51,22 @@ class HomeTabBarContentState extends State<HomeTabBarContent> {
           key: ValueKey(index),
           controller:controller,
           index: index,
-          child: MediaQuery.removePadding(context: context, removeTop: true, child: StaggeredGridView.countBuilder(
-              crossAxisCount: 3,
-              itemCount:200,
-              shrinkWrap: true,
-              itemBuilder: (BuildContext context, int childIndex) {
-                return Container(
-                  color: Colors.green,
-                  child: Text("$index"),
-                );
-              },
-              staggeredTileBuilder: (int index) =>
-                  StaggeredTile.count((index > 2) ? 3 : 1, 1),
-              mainAxisSpacing: 6,
-              crossAxisSpacing: 6)
+          child:Container(
+            child:  MediaQuery.removePadding(context: context, removeTop: true, child: StaggeredGridView.countBuilder(
+                crossAxisCount: 3,
+                itemCount:200,
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int childIndex) {
+                  return Container(
+                    color: Colors.green,
+                    child: Text("$index"+"$childIndex"),
+                  );
+                },
+                staggeredTileBuilder: (int index) =>
+                    StaggeredTile.count((index > 2) ? 3 : 1, 1),
+                mainAxisSpacing: 6,
+                crossAxisSpacing: 6)
+            ),
           )
       );
     },
