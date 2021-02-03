@@ -6,7 +6,7 @@ import 'package:flutter_home/home_banner_widget.dart';
 import 'package:flutter_home/tab/home_tabbar.dart';
 import 'package:flutter_home/tab/home_tabbar_content.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+
 
 class ShopPage extends StatefulWidget {
   ShopPage({Key key}) : super(key: key);
@@ -49,7 +49,6 @@ class _ShopPageState extends State<ShopPage>
   Widget build(BuildContext context) {
     super.build(context);
 
-    // 滑动冲突，解决列表滑动流畅即可，必须在CustomScrollView里面使用flutter_staggered_grid_view
 
     return Scaffold(
       body:  CustomScrollView(
@@ -82,20 +81,13 @@ class _ShopPageState extends State<ShopPage>
             },
           ),
           SliverFillRemaining(
-            child: StaggeredGridView.countBuilder(
-                crossAxisCount: 3,
-                itemCount:200,
-                shrinkWrap: true,
-                itemBuilder: (BuildContext context, int childIndex) {
-                  return Container(
-                    color: Colors.green,
-                    child: Text("$childIndex"),
-                  );
-                },
-                staggeredTileBuilder: (int index) =>
-                    StaggeredTile.count((index > 2) ? 3 : 1, 1),
-                mainAxisSpacing: 6,
-                crossAxisSpacing: 6)
+            child: HomeTabBarContent(
+                  key: homeTabBarContentState,
+                  onChange: (int index){
+                    homeTabBarState.currentState.scrollToIndex(index);
+                  }
+                  ,
+            ),
           )
         ],
       )
