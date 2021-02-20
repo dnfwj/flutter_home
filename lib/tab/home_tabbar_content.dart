@@ -55,7 +55,6 @@ class HomeTabBarContentState extends State<HomeTabBarContent> {
             child:  MediaQuery.removePadding(context: context, removeTop: true, child: StaggeredGridView.countBuilder(
                 crossAxisCount: 3,
                 itemCount:200,
-                shrinkWrap: true,
                 itemBuilder: (BuildContext context, int childIndex) {
                   return Container(
                     color: Colors.green,

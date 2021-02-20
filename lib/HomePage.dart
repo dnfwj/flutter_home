@@ -3,9 +3,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_home/home_banner_widget.dart';
+import 'package:flutter_home/scroll/OutLetNestedScroll.dart';
 import 'package:flutter_home/tab/home_tabbar.dart';
 import 'package:flutter_home/tab/home_tabbar_content.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 
 class ShopPage extends StatefulWidget {
@@ -32,14 +34,15 @@ class _ShopPageState extends State<ShopPage>
 
   ];
 
-  //子控件是否滑动了
-  Drag drag;
-  DragStartDetails dragStartDetails;
-  bool onEdge = false;
+
+
+
+
 
   @override
   void initState() {
     super.initState();
+
 
   }
 
@@ -49,6 +52,49 @@ class _ShopPageState extends State<ShopPage>
   Widget build(BuildContext context) {
     super.build(context);
 
+
+
+    return Scaffold(
+      body:  OutLetNestedScroll(
+
+          headerSliverBuilder:(BuildContext context, bool innerBoxIsScrolled){
+            return [
+              SliverToBoxAdapter(),
+              HomeBannerWidget(),
+              SliverPadding(padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3, crossAxisSpacing: 5, mainAxisSpacing: 3),
+                  delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+                    return Container(
+                      color: Colors.primaries[index % Colors.primaries.length],
+                    );
+                  }, childCount: 20),
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate((BuildContext context, int index){
+                  return ListTile(title: Text('高度不固定${index+1}'),);
+                }, childCount: 40),
+              ),
+
+              HomeTabBar(
+                tabBarHeight: _tabBarHeight,
+                key:homeTabBarState ,
+                onChange: (int index){
+                  homeTabBarContentState.currentState.scrollToIndex(index);
+                },
+              ),
+            ];
+
+          } ,
+          body: HomeTabBarContent(
+            key: homeTabBarContentState,
+            onChange: (int index){
+              homeTabBarState.currentState.scrollToIndex(index);
+            }
+            ,
+          )));
 
     return Scaffold(
       body:  CustomScrollView(
@@ -82,17 +128,22 @@ class _ShopPageState extends State<ShopPage>
           ),
           SliverFillRemaining(
             child: HomeTabBarContent(
-                  key: homeTabBarContentState,
-                  onChange: (int index){
-                    homeTabBarState.currentState.scrollToIndex(index);
-                  }
-                  ,
+              key: homeTabBarContentState,
+              onChange: (int index){
+                homeTabBarState.currentState.scrollToIndex(index);
+              }
+              ,
             ),
           )
         ],
-      )
 
+
+      ),
     );
+
+
+
+
   }
 
   @override
