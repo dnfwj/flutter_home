@@ -56,17 +56,17 @@ class OutLetNestedScroll extends StatefulWidget {
 class OutLetNestedScrollState extends State<OutLetNestedScroll> {
 
 
-  ScrollController get innerController => _coordinator.innerController;
+  ScrollController get innerController => coordinator.innerController;
 
-  ScrollController get outerController => _coordinator.outerController;
+  ScrollController get outerController => coordinator.outerController;
 
-  NestedScrollCoordinator _coordinator;
+  NestedScrollCoordinator coordinator;
 
   @override
   void initState() {
     super.initState();
-    _coordinator = NestedScrollCoordinator(
-      this, widget.controller,
+    coordinator = NestedScrollCoordinator(
+      context, widget.controller,
       _handleHasScrolledBodyChanged,
       widget.floatHeaderSlivers,
     );
@@ -75,20 +75,20 @@ class OutLetNestedScrollState extends State<OutLetNestedScroll> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _coordinator.setParent(widget.controller);
+    coordinator.setParent(widget.controller);
   }
 
   @override
   void didUpdateWidget(covariant OutLetNestedScroll oldWidget) {
     super.didUpdateWidget(oldWidget);
       if (oldWidget.controller != widget.controller)
-        _coordinator.setParent(widget.controller);
+        coordinator.setParent(widget.controller);
   }
 
   @override
   void dispose() {
-    _coordinator.dispose();
-    _coordinator = null;
+    coordinator.dispose();
+    coordinator = null;
     super.dispose();
   }
 
@@ -97,7 +97,7 @@ class OutLetNestedScrollState extends State<OutLetNestedScroll> {
   void _handleHasScrolledBodyChanged() {
     if (!mounted)
       return;
-    final bool newHasScrolledBody = _coordinator.hasScrolledBody;
+    final bool newHasScrolledBody = coordinator.hasScrolledBody;
     if (_lastHasScrolledBody != newHasScrolledBody) {
       setState(() {
 
@@ -109,7 +109,7 @@ class OutLetNestedScrollState extends State<OutLetNestedScroll> {
   Widget build(BuildContext context) {
     return Builder(
       builder: (BuildContext context) {
-        _lastHasScrolledBody = _coordinator.hasScrolledBody;
+        _lastHasScrolledBody = coordinator.hasScrolledBody;
 
         return CustomScrollView(
           restorationId: widget.restorationId,
@@ -120,9 +120,9 @@ class OutLetNestedScrollState extends State<OutLetNestedScroll> {
           physics: widget.physics != null
               ? widget.physics.applyTo(const ClampingScrollPhysics())
               : const ClampingScrollPhysics(),
-          controller: _coordinator.outerController,
+          controller: coordinator.outerController,
           slivers: [
-            ...widget._buildSlivers(context, _coordinator.innerController, _lastHasScrolledBody)
+            ...widget._buildSlivers(context, coordinator.innerController, _lastHasScrolledBody)
           ],
         );
       });

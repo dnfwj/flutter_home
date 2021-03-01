@@ -9,13 +9,12 @@ import 'NestedScrollMetrics.dart';
 import 'NestedScrollPosition.dart';
 import 'dart:math' as math;
 
-import 'OutLetNestedScroll.dart';
 
 typedef NestedScrollActivityGetter = ScrollActivity Function(NestedScrollPosition position);
 
 class NestedScrollCoordinator implements ScrollActivityDelegate, ScrollHoldController {
   NestedScrollCoordinator(
-      this._state,
+      this.context,
       this._parent,
       this._onHasScrolledBodyChanged,
       this._floatHeaderSlivers,
@@ -33,7 +32,7 @@ class NestedScrollCoordinator implements ScrollActivityDelegate, ScrollHoldContr
     );
   }
 
-  final OutLetNestedScrollState _state;
+  final BuildContext context;
   ScrollController _parent;
   final VoidCallback _onHasScrolledBodyChanged;
   final bool _floatHeaderSlivers;
@@ -444,7 +443,7 @@ class NestedScrollCoordinator implements ScrollActivityDelegate, ScrollHoldContr
 
   void updateParent() {
     _outerPosition?.setParent(
-        _parent ?? PrimaryScrollController.of(_state.context)
+        _parent ?? PrimaryScrollController.of(context)
     );
   }
 

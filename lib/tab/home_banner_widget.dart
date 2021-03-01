@@ -1,8 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_home/tab/my_flexible_space_bar.dart';
-import 'package:flutter_home/tab/my_sliver_app_bar.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 class HomeBannerWidget extends StatefulWidget {
   @override
@@ -71,7 +69,7 @@ class _HomeBannerWidgetState extends State<HomeBannerWidget>    {
 
     return Theme(
       data: ThemeData(primaryColor:Colors.white,),
-      child:  MySliverAppBar(
+      child:  SliverAppBar(
         backgroundColor: Colors.black,
         leading:  IconButton(
           icon: Icon(Icons.menu,color: Colors.white,),
@@ -95,7 +93,7 @@ class _HomeBannerWidgetState extends State<HomeBannerWidget>    {
             },
           ),
         ],
-        flexibleSpace: MyFlexibleSpaceBar(
+        flexibleSpace: FlexibleSpaceBar(
             background:
             Stack(
               children: [
