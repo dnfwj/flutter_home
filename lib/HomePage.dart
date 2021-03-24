@@ -1,5 +1,3 @@
-
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_home/scroll/OutLetNestedScroll.dart';
@@ -25,9 +23,7 @@ class _ShopPageState extends State<ShopPage>
   ///页面滑动协调器
   GlobalKey<HomeTabBarState>  homeTabBarState = GlobalKey<HomeTabBarState>();
   GlobalKey<HomeTabBarContentState>  homeTabBarContentState = GlobalKey<HomeTabBarContentState>();
-  GlobalKey<OutLetNestedScrollState>  _outLet = GlobalKey<OutLetNestedScrollState>();
 
-  ScrollController _scrollController = ScrollController();
   final double _tabBarHeight = 50;
   List<Map<String ,String>> homeSearchTitle = [
     {'title': '猜你喜欢', 'subTitle': '我最懂你'},
@@ -47,19 +43,6 @@ class _ShopPageState extends State<ShopPage>
     super.initState();
 
 
-    //
-   _scrollController.addListener(() {
-      if( _scrollController.position.maxScrollExtent==  _scrollController.position.pixels){
-        print("外部滑动到底了----");
-        _outLet.currentState.innerController.addListener(() {
-          print("内部开始滚动---${_outLet.currentState.innerController.position.pixels}");
-          if(  _outLet.currentState.innerController.position.maxScrollExtent==   _outLet.currentState.innerController.position.pixels){
-            print("内部滑动到底了----");
-            homeTabBarContentState.currentState.loadMore();
-          }
-        });
-      }
-    });
 
   }
 
@@ -69,64 +52,51 @@ class _ShopPageState extends State<ShopPage>
     super.build(context);
 
 
-   print("_outLet.currentState.innerController");
-    print(_outLet.currentState.innerController);
-
     return Scaffold(
-      body:
-      NestedRefreshIndicator(
-        notificationPredicate: (ScrollNotification notification) {
+      body:CustomScrollView (
+          slivers: [
+            SliverToBoxAdapter(),
+            HomeBannerWidget(),
+            SliverPadding(padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+              sliver: SliverGrid(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3, crossAxisSpacing: 5, mainAxisSpacing: 3),
+                delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+                  return Container(
+                    color: Colors.primaries[index % Colors.primaries.length],
+                  );
+                }, childCount: 20),
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate((BuildContext context, int index){
+                return ListTile(title: Text('高度不固定${index+1}'),);
+              }, childCount: 40),
+            ),
 
-          return true;
-        },
-        onRefresh: () {
-          return Future.delayed(Duration(seconds: 2), () {
-            return true;
-          });
-        },
-        child: OutLetNestedScroll(
-          key: _outLet,
-            controller: _scrollController,
-            headerSliverBuilder:(BuildContext context, bool innerBoxIsScrolled){
-              return [
-                SliverToBoxAdapter(),
-                HomeBannerWidget(),
-                SliverPadding(padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                  sliver: SliverGrid(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3, crossAxisSpacing: 5, mainAxisSpacing: 3),
-                    delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                      return Container(
-                        color: Colors.primaries[index % Colors.primaries.length],
-                      );
-                    }, childCount: 20),
-                  ),
-                ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate((BuildContext context, int index){
-                    return ListTile(title: Text('高度不固定${index+1}'),);
-                  }, childCount: 40),
-                ),
-
-                HomeTabBar(
-                  tabBarHeight: _tabBarHeight,
-                  key:homeTabBarState ,
-                  onChange: (int index){
-                    homeTabBarContentState.currentState.scrollToIndex(index);
-                  },
-                ),
-              ];
-
-            } ,
-            body:  HomeTabBarContent(
-              key: homeTabBarContentState,
+            HomeTabBar(
+              tabBarHeight: _tabBarHeight,
+              key:homeTabBarState ,
               onChange: (int index){
-                homeTabBarState.currentState.scrollToIndex(index);
-              }
-              ,
+                homeTabBarContentState.currentState.scrollToIndex(index);
+              },
+            ),
+            SliverFillRemaining(
+              child: HomeTabBarContent(
+                key: homeTabBarContentState,
+                onChange: (int index){
+                  homeTabBarState.currentState.scrollToIndex(index);
+                }
+                ,
+              ),
             )
-        ) ,
+          ],
+
+
+
+
       )
+
     );
 
 
