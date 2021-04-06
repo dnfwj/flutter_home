@@ -24,76 +24,107 @@ class HomeTabBarContentState extends State<HomeTabBarContent> {
     {'title': '每日上新', 'subTitle': '12:00准时上新'},
     {'title': '榜单', 'subTitle': '大家在买'},
   ];
-  AutoScrollController controller;
+  AutoScrollController _autoController;
   PageController _pageController;
-
-  double screenWidth = 375;
   String loadMoreText = "正在加载.....";
   List<int> _data = [0, 1, 2, 3, 4, 5, 6, 7,8,9,10];
+  bool isLoadingMore = true;
+  int _index = 0;
+
   @override
   void initState() {
     super.initState();
-    controller = AutoScrollController(axis: Axis.vertical);
+    _autoController = AutoScrollController(axis: Axis.vertical);
     _pageController = PageController();
   }
 
   scrollToIndex(int index) {
+    _index = index;
     _pageController.jumpToPage(index);
   }
 
   loadMore() {
-    //判断是猜你喜欢，还是爆款还是每日上新，还是榜单
-    Future.delayed(Duration(seconds: 2), () {
-      List<int> data = [];
-      data.addAll(_data);
-      for (int i = 1; i < 20; i++) {
-        data.add(data[i] + i);
-      }
-      this.setState(() {
-        _data = data;
-      });
-    });
-  }
 
+    print("调用过一次+$_index"+isLoadingMore.toString());
+
+    if(isLoadingMore){
+      isLoadingMore = false;
+
+      Future.delayed(Duration(seconds: 4), () {
+        List<int> data = [];
+        data.addAll(_data);
+        for (int i = 1; i < 20; i++) {
+          data.add(data[i] + i);
+        }
+        isLoadingMore = true;
+        this.setState(() {
+          _data = data;
+        });
+
+      });
+    }
+    //判断是猜你喜欢，还是爆款还是每日上新，还是榜单
+
+  }
+  bool onNotification(ScrollNotification notification){
+    final ScrollMetrics metrics = notification.metrics;
+    if(metrics.axis == Axis.vertical ){
+      if(metrics.pixels == metrics.maxScrollExtent && metrics.axisDirection == AxisDirection.down){
+        this.loadMore();
+        return true;
+      }
+    }
+    return false;
+  }
   @override
   Widget build(BuildContext context) {
+
     return PageView.builder(
       itemBuilder: (BuildContext context, int index) {
         return AutoScrollTag(
             key: ValueKey(index),
-            controller: controller,
+            controller: _autoController,
             index: index,
-            child: Container(
-              child: MediaQuery.removePadding(
-                  context: context,
-                  removeTop: true,
-                  child: StaggeredGridView.countBuilder(
-                      crossAxisCount: 3,
-                      itemCount: _data.length,
-                      itemBuilder: (BuildContext context, int childIndex) {
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              color: Colors.green,
-                              width: double.infinity,
-                              alignment: Alignment.center,
-                              child: Text("$index--------" + "$childIndex"),
-                            ),
-                            Visibility(child:this.buildLoadMore(),visible: _data.length -1 == childIndex,)
-                          ],
-                        );
-                      },
-                      staggeredTileBuilder: (int index) => StaggeredTile.count(
-                          (index > 2) ? 3 : 1, index == (50 - 1) ? 1.4 : 1),
-                      mainAxisSpacing: 6,
-                      crossAxisSpacing: 6)),
+            child: NotificationListener(
+              onNotification: this.onNotification,
+              child: Container(
+                child: MediaQuery.removePadding(
+                    context: context,
+                    removeTop: true,
+                    child: StaggeredGridView.countBuilder(
+                        crossAxisCount: 3,
+                        itemCount: _data.length,
+                        shrinkWrap: true, // todo comment this out and check the result
+                        physics: ClampingScrollPhysics(), // todo comment this out and check the result
+                        itemBuilder: (BuildContext context, int childIndex) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                color: Colors.green,
+                                width: double.infinity,
+                                alignment: Alignment.center,
+                                child: Text("$index--------" + "$childIndex"),
+                              ),
+                              Visibility(child:this.buildLoadMore(),visible: _data.length -1 == childIndex,)
+                            ],
+                          );
+                        },
+                        staggeredTileBuilder: (int index) => StaggeredTile.count(
+                            (index > 2) ? 3 : 1, index == (50 - 1) ? 1.4 : 1),
+                        mainAxisSpacing: 6,
+                        crossAxisSpacing: 6)
+                ),
+              ),
             ));
       },
       itemCount: homeSearchTitle.length,
       scrollDirection: Axis.horizontal,
       controller: _pageController,
-      onPageChanged: widget.onChange,
+      onPageChanged: (int index){
+        _index = index;
+        widget.onChange(index);
+      },
     );
   }
 
@@ -111,6 +142,8 @@ class HomeTabBarContentState extends State<HomeTabBarContent> {
 
   @override
   void dispose() {
+    _pageController.dispose();
+    _autoController.dispose();
     super.dispose();
   }
 }
