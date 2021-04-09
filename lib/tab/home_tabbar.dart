@@ -58,7 +58,7 @@ class HomeTabBarState extends State<HomeTabBar> {
        return    SliverPersistentHeader(
       pinned: true,
       floating: false,
-      delegate: _SliverAppBarDelegate(
+      delegate: SliverAppBarDelegate(
           maxHeight: widget.tabBarHeight,
           minHeight: widget.tabBarHeight,
           child:   Container(
@@ -74,10 +74,11 @@ class HomeTabBarState extends State<HomeTabBar> {
                     child: InkWell(
                       onTap: () {
                         if (_index != index) {
-                          widget.onChange(index);
                           this.setState(() {
                             _index = index;
                           });
+                          widget.onChange(index);
+
                         }
                       },
                       child: Container(
@@ -137,8 +138,8 @@ class HomeTabBarState extends State<HomeTabBar> {
   }
 }
 
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  _SliverAppBarDelegate({
+class SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  SliverAppBarDelegate({
     @required this.minHeight,
     @required this.maxHeight,
     @required this.child,
@@ -162,7 +163,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+  bool shouldRebuild(SliverAppBarDelegate oldDelegate) {
     return maxHeight != oldDelegate.maxHeight ||
         minHeight != oldDelegate.minHeight ||
         child != oldDelegate.child;

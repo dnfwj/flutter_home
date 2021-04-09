@@ -1,14 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_home/scroll/OutLetNestedScroll.dart';
 import 'package:flutter_home/tab/home_banner_widget.dart';
 import 'package:flutter_home/tab/home_tabbar.dart';
 import 'package:flutter_home/tab/home_tabbar_content.dart';
-import 'package:flutter_home/wrap_notify_widget.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-
 import 'scroll/NestedRefreshIndicator.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 
 class ShopPage extends StatefulWidget {
@@ -23,7 +20,6 @@ class _ShopPageState extends State<ShopPage>
     with SingleTickerProviderStateMixin ,AutomaticKeepAliveClientMixin{
   ///页面滑动协调器
   GlobalKey<HomeTabBarState>  homeTabBarState = GlobalKey<HomeTabBarState>();
-  GlobalKey<HomeTabBarContentState>  homeTabBarContentState = GlobalKey<HomeTabBarContentState>();
 
   final double _tabBarHeight = 50;
   List<Map<String ,String>> homeSearchTitle = [
@@ -35,103 +31,83 @@ class _ShopPageState extends State<ShopPage>
   ];
 
 
+  AutoScrollController _autoController;
+  PageController _pageController;
 
 
 
 
   @override
   void initState() {
+    _autoController = AutoScrollController(axis: Axis.vertical);
+    _pageController = PageController();
+
     super.initState();
 
 
 
   }
 
+ bool  onNotification(ScrollNotification notification){
+   //该属性包含当前ViewPort及滚动位置等信息
+   ScrollMetrics metrics = notification.metrics;
 
+   if(metrics.axis == Axis.vertical){
+     print("滚动到最地步了metrics.pixels:${metrics.pixels} maxScrollExtent:${metrics.maxScrollExtent} minScrollExtent:${metrics.minScrollExtent}");
+
+     if(metrics.minScrollExtent == 0.0 && metrics.pixels == 0.0 ){
+       return true;
+     }
+
+   }
+   return false;
+ }
 
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Scaffold(
-      body:
-      NestedRefreshIndicator(
-        //可滚动组件在滚动时会发送ScrollNotification类型的通知
-          notificationPredicate: (ScrollNotification notification) {
+   return Scaffold(
+     body:  CustomScrollView(
+       slivers: [
+         SliverToBoxAdapter(),
+         HomeBannerWidget(),
+         SliverList(
+           delegate: SliverChildBuilderDelegate((BuildContext context, int index){
+             return ListTile(title: Text('高度不固定${index+1}'),);
+           }, childCount: 29),
+         ),
 
-            //该属性包含当前ViewPort及滚动位置等信息
-            ScrollMetrics metrics = notification.metrics;
+         HomeTabBar(
+           tabBarHeight: _tabBarHeight,
+           key:homeTabBarState ,
+           onChange: (int index){
+             _pageController.jumpToPage(index);
+           },
+         ),
+         SliverFillRemaining(
+           child: PageView.builder(
+             itemBuilder: (BuildContext context, int index) {
+               return AutoScrollTag(
+                   key: ValueKey(index),
+                   controller: _autoController,
+                   index: index,
+                   child:HomeTabBarContent(index:index)
 
-            if(metrics.axis == Axis.vertical){
-              print("12312312");
-              print(metrics.minScrollExtent == 0.0);
-              return  metrics.minScrollExtent == 0.0 ;
-            }
-            return false;
-          },
-          //下拉刷新回调方法
-          onRefresh: () async {
-
-
-
-            //模拟网络刷新 等待2秒
-            await Future.delayed(Duration(milliseconds: 2000));
-            //返回值以结束刷新
-            return Future.value(true);
-          },
-          child: NestedScrollView (
-            headerSliverBuilder:(BuildContext context, bool innerBoxIsScrolled){
-              return [
-                SliverToBoxAdapter(),
-                HomeBannerWidget(),
-                SliverPadding(padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                  sliver: SliverGrid(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3, crossAxisSpacing: 5, mainAxisSpacing: 3),
-                    delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                      return Container(
-                        color: Colors.primaries[index % Colors.primaries.length],
-                      );
-                    }, childCount: 10),
-                  ),
-                ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate((BuildContext context, int index){
-                    return ListTile(title: Text('高度不固定${index+1}'),);
-                  }, childCount: 29),
-                ),
-
-                HomeTabBar(
-                  tabBarHeight: _tabBarHeight,
-                  key:homeTabBarState ,
-                  onChange: (int index){
-                    homeTabBarContentState.currentState.scrollToIndex(index);
-                  },
-                ),
-              ];
-            },
-
-            body:
-
-            // Container(
-            //   height: 200,
-            // )
-
-            HomeTabBarContent(
-              key: homeTabBarContentState,
-              onChange: (int index){
-                homeTabBarState.currentState.scrollToIndex(index);
-              }
-              ,
-
-
-            ),
-          )
-      )
-
-
-    );
+               );
+             },
+             itemCount: homeSearchTitle.length,
+             scrollDirection: Axis.horizontal,
+             controller: _pageController,
+             onPageChanged: (int index){
+               homeTabBarState.currentState.scrollToIndex(index);
+             },
+           ),
+         )
+       ],
+     ),
+   );
 
 
 
