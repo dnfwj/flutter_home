@@ -4,7 +4,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_home/tab/home_banner_widget.dart';
 import 'package:flutter_home/tab/home_tabbar.dart';
 import 'package:flutter_home/tab/home_tabbar_content.dart';
-import 'scroll/NestedRefreshIndicator.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 
@@ -45,7 +44,13 @@ class _ShopPageState extends State<ShopPage>
     super.initState();
 
 
+    print("我是线测试的代码 主分支");
+    this.initData();
 
+  }
+
+  initData(){
+    print("测试git分支");
   }
 
  bool  onNotification(ScrollNotification notification){
