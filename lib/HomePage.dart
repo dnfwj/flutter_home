@@ -45,7 +45,12 @@ class _ShopPageState extends State<ShopPage>
     super.initState();
 
 
+    initF();
 
+  }
+
+  initF(){
+    print("这是分支代码");
   }
 
  bool  onNotification(ScrollNotification notification){
